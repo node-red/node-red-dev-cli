@@ -130,7 +130,6 @@ function checkpackage(path, cli, scorecard) {
         console.log('check names') //TODO
     })
     .then(() => {
-        console.log('resolve scorecard')
         return scorecard
     })
     .catch(() => {

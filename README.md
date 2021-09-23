@@ -28,27 +28,10 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`node-red-dev hello`](#node-red-dev-hello)
+
 * [`node-red-dev help [COMMAND]`](#node-red-dev-help-command)
 * [`node-red-dev validate`](#node-red-dev-validate)
 
-## `node-red-dev hello`
-
-Describe the command here
-
-```
-USAGE
-  $ node-red-dev hello
-
-OPTIONS
-  -n, --name=name  name to print
-
-DESCRIPTION
-  ...
-  Extra documentation goes here
-```
-
-_See code: [src/commands/hello.js](https://github.com/node-red/node-red-dev/blob/v0.0.1/src/commands/hello.js)_
 
 ## `node-red-dev help [COMMAND]`
 
@@ -69,14 +52,18 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3
 
 ## `node-red-dev validate`
 
-Describe the command here
-
+Run the full suite of Validation tests
+...
+By default the tool will look in the current folder for a package, 
+you can also specify a path with --path or a published npm package with --npm
+`
 ```
 USAGE
   $ node-red-dev validate
 
 OPTIONS
-  -n, --name=name  name to print
+  --npm=package  name of a package on npm to validate
+  --path=path Path to a package on the local filesystem to validate (defaults to ./)
 
 DESCRIPTION
   ...
