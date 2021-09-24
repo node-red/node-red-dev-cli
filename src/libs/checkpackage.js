@@ -4,6 +4,7 @@ const { t } = require('tar');
 const { SemVer } = require('semver');
 const p = require('path')
 const nodegit = require('nodegit');
+const axios = require('axios')
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
@@ -29,7 +30,7 @@ function checkpackage(path, cli, scorecard) {
       .then(() => {
         //MUST Have Repository or Bugs url/email
         if (package.hasOwnProperty('repository') || package.hasOwnProperty('bugs')){
-            cli.log(`✅ Repository/Bugs Link Suppllied`)
+            cli.log(`✅ Repository/Bugs Link Supplied`)
             scorecard.package.bugs = {'test' : true}
         } else {
             cli.error('Please provide either a repoistory URL or a Bugs URL/Email')
@@ -123,9 +124,9 @@ function checkpackage(path, cli, scorecard) {
         if ( package.hasOwnProperty('engines') && package.engines.hasOwnProperty('node')){
             const nrminversion = axios.get('https://registry.npmjs.org/node-red')
             .then(response => {               
-                resolve(semver.minVersion(response.versions[response["dist-tags"].latest.engines.node).version)
+                resolve(semver.minVersion(response.versions[response["dist-tags"].latest].engines.node.version))
             })
-            if  semver.satisfies(nrminversion, package.engines.node){
+            if  (semver.satisfies(nrminversion, package.engines.node)){
                 cli.log('✅ Engine compatilble')   
             } else {
                 cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nrminversion)
@@ -137,13 +138,13 @@ function checkpackage(path, cli, scorecard) {
     .then(() => {
         //Check for other package of same name in different scope, ask about fork?
         scorecard.uniqname = {}
-        const catalog = axios.get('https://catalogue.nodered.org/catalogue.json')
         const name = package.name.split('/').slice(-1) // Package name without scope
         let similar = false
         let similarlist = []
+        axios.get('https://catalogue.nodered.org/catalogue.json')
         .then(response => {               
             response.modules.forEach((m) => {
-                if name.includes(m.id.split('/').slice(-1)){
+                if (name.includes(m.id.split('/').slice(-1))){
                     cli.warn(`Similar named package found at ${m.id}`)
                     similar = true
                     similarlist.push(m.id)
@@ -163,8 +164,8 @@ function checkpackage(path, cli, scorecard) {
     .then(() => {
         return scorecard
     })
-    .catch(() => {
-        cli.error('Error');
+    .catch((e) => {
+        cli.error(e);
       });
 
 }

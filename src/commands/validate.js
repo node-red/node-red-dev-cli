@@ -26,8 +26,8 @@ class ValidateCommand extends Command {
         }
       }
     })
-    .catch(()=> {
-      cli.error('Error')
+    .catch((e)=> {
+      cli.error(e)
     })
     .then(() =>{
       cli.log('Complete')
