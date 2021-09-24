@@ -120,8 +120,16 @@ function checkpackage(path, cli, scorecard) {
     .then(() => {
         //SHOULD declare min node version in engines
         if ( package.hasOwnProperty('engines') && package.engines.hasOwnProperty('node')){
-            cli.log('✅ Engine compatilble') //TODO match against supported NR versions
-        } else {
+            const nrminversion = axios.get('https://registry.npmjs.org/node-red')
+            .then(response => {               
+                resolve(semver.minVersion(response.versions[response["dist-tags"].latest.engines.node).version)
+            })
+            if  semver.satisfies(nrminversion, package.engines.node){
+                cli.log('✅ Engine compatilble')   
+            } else {
+                cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nrminversion)
+            }
+        } else {    
             cli.warn('Node version not declared in engines')
         }  
     })
