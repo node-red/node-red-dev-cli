@@ -52,7 +52,7 @@ function checkpackage(path, cli, scorecard) {
                 let path = r.workdir()
                 let repopackage = require(path+'/package.json')
                 if (package.name != repopackage.name){
-                    cli.warn('Package name differes from package in repoistory')
+                    cli.warn('Package name differes from package in repository')
                     readline.question('Is this a fork of an existing package?', note => {
                         scorecard.package.name = { 'test' : false, 'note' : note}
                         readline.close();
@@ -119,6 +119,7 @@ function checkpackage(path, cli, scorecard) {
     })
     .then(() => {
         //SHOULD declare min node version in engines
+        scorecard.nodeversion
         if ( package.hasOwnProperty('engines') && package.engines.hasOwnProperty('node')){
             const nrminversion = axios.get('https://registry.npmjs.org/node-red')
             .then(response => {               
@@ -135,7 +136,29 @@ function checkpackage(path, cli, scorecard) {
     })
     .then(() => {
         //Check for other package of same name in different scope, ask about fork?
-        console.log('check names') //TODO
+        scorecard.uniqname = {}
+        const catalog = axios.get('https://catalogue.nodered.org/catalogue.json')
+        const name = package.name.split('/').slice(-1) // Package name without scope
+        let similar = false
+        let similarlist = []
+        .then(response => {               
+            response.modules.forEach((m) => {
+                if name.includes(m.id.split('/').slice(-1)){
+                    cli.warn(`Similar named package found at ${m.id}`)
+                    similar = true
+                    similarlist.push(m.id)
+                }
+            })
+            if (similar){
+                scorecard.uniqname.test = false
+                scorecard.uniqname.similar = similarlist
+                readline.question('Add a note about the package name?', note => {
+                    scorecard.uniqname.note =  note
+                    readline.close();
+                });
+
+            }
+        })
     })
     .then(() => {
         return scorecard
