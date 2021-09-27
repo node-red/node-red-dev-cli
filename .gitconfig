@@ -1,0 +1,7 @@
+[user]
+    email = sam@sammachin.com
+    name = sammachin
+[gpg]
+    program = gpg2
+[commit]
+    gpgsign = true

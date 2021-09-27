@@ -11,6 +11,7 @@ Node-RED Node Developer Tools
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
+* [Running](#running)
 <!-- tocstop -->
 # Usage
 <!-- usage -->
@@ -72,3 +73,16 @@ DESCRIPTION
 
 _See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev/blob/v0.0.1/src/commands/validate.js)_
 <!-- commandsstop -->
+
+
+# Running
+<!-- running -->
+_Eventually the tool will be published on NPM but these instructions are for installing and running from source_
+
+Clone the repo and install dependencies by running `npm install`
+
+You can then test the command using `./bin/run [COMMAND]`
+
+If you want to test the command globally run `npm link` from the project folder and it will create a symlink for `node-red-dev` in your 
+
+<!-- runningstop -->
