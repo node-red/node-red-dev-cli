@@ -84,4 +84,5 @@ Clone the repo and install dependencies by running `npm install`
 You can then test the command using `./bin/run [COMMAND]`
 
 If you want to test the command globally run `npm link` from the project folder and it will create a symlink for `node-red-dev` in the global folder. 
+
 <!-- runningstop -->
