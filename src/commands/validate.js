@@ -1,6 +1,8 @@
 const {Command, flags} = require('@oclif/command')
 const getFromNPM = require('../libs/npmget')
 const checkpackage = require('../libs/checkpackage')
+const checknodes = require('../libs/checknodes')
+
 const fs = require('fs');
 
 let path = ''
@@ -16,8 +18,11 @@ class ValidateCommand extends Command {
     } else {
       path = '.'
     }
-    await checkpackage(path, this, scorecard)
+    await checkpackage(path, cli, scorecard)
     .then(scorecard => {
+      return checknodes(path, cli, scorecard)
+    })
+    .then(() => {
       if (flags.card){
         try {
           fs.writeFileSync(flags.card+'/scorecard.json', JSON.stringify(scorecard))
@@ -26,6 +31,7 @@ class ValidateCommand extends Command {
         }
       }
     })
+    
     .catch((e)=> {
       cli.error(e)
     })
@@ -45,9 +51,9 @@ you can also specify a path with --path or a published npm package with --npm.
 `
 
 ValidateCommand.flags = {
-  npm: flags.string({char: 'npm', description: 'name of package on npm to validate'}),
+  npm: flags.string({char: 'npm', description: 'Name of package on npm to validate'}),
   path: flags.string({char: 'path', description: 'Path of package  to validate'}),
-  card: flags.string({char: 'scorecard', description: 'Path of package  to validate'}),
+  card: flags.string({char: 'card', description: 'Path to write scorecard.json'}),
 }
 
 

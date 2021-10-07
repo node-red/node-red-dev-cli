@@ -33,7 +33,7 @@ function checkpackage(path, cli, scorecard) {
             cli.log(`✅ Repository/Bugs Link Supplied`)
             scorecard.package.bugs = {'test' : true}
         } else {
-            cli.error('Please provide either a repoistory URL or a Bugs URL/Email')
+            cli.error('Please provide either a repository URL or a Bugs URL/Email')
             scorecard.package.bugs = {'test' : false}
         }
       })
@@ -137,13 +137,13 @@ function checkpackage(path, cli, scorecard) {
     })
     .then(() => {
         //Check for other package of same name in different scope, ask about fork?
-        scorecard.uniqname = {}
+        scorecard.package.uniqname = {test : true}
         const name = package.name.split('/').slice(-1) // Package name without scope
         let similar = false
         let similarlist = []
-        axios.get('https://catalogue.nodered.org/catalogue.json')
+        return axios.get('https://catalogue.nodered.org/catalogue.json')
         .then(response => {               
-            response.modules.forEach((m) => {
+            response.data.modules.forEach((m) => {
                 if (name.includes(m.id.split('/').slice(-1))){
                     cli.warn(`Similar named package found at ${m.id}`)
                     similar = true
@@ -151,15 +151,19 @@ function checkpackage(path, cli, scorecard) {
                 }
             })
             if (similar){
-                scorecard.uniqname.test = false
-                scorecard.uniqname.similar = similarlist
+                scorecard.package.uniqname.test = false
+                scorecard.package.uniqname.similar = similarlist
                 readline.question('Add a note about the package name?', note => {
-                    scorecard.uniqname.note =  note
+                    scorecard.package.uniqname.note =  note
                     readline.close();
                 });
 
+            } else {
+                cli.log('✅ No similar named packages found')
             }
+            return similar
         })
+        scorecard.package.uniqname.test = !test
     })
     .then(() => {
         return scorecard
