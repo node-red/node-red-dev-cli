@@ -25,9 +25,9 @@ function getFromNPM(package, version) {
             fs.writeFile(tarball, response.data, function(err) {
               if (err) reject(err);
               else {
-                return tar.x({ file: tarball,  cwd: path, sync: false })
+                return tar.x({ file: tarball,  cwd: path, sync: false, strip: 1 })
                 .then(r => {
-                  resolve(path+'/package')
+                  resolve(path)
                 })
               }                     
             });
