@@ -1,7 +1,7 @@
 const os = require('os')
 const fs = require('fs');
 const { t } = require('tar');
-const { SemVer } = require('semver');
+const semver = require('semver');
 const p = require('path')
 const nodegit = require('nodegit');
 const axios = require('axios')
@@ -88,9 +88,9 @@ function checkpackage(path, cli, scorecard) {
     .then(() => {
       //SHOULD declare min node-red version in node-red
         if (package['node-red'].hasOwnProperty('version')){
-            const versions = axios.get('https://registry.npmjs.org/node-red')
+            return axios.get('https://registry.npmjs.org/node-red')
             .then(response => {
-            let tags = response['dist-tags']
+            let tags = response.data['dist-tags']
             let supportedRegex = new RegExp('.*maintenance.*|^latest$') // check which versions have a latest or maintaince tag
             let versions = []
             Object.keys(tags).forEach(t => {
@@ -98,21 +98,19 @@ function checkpackage(path, cli, scorecard) {
     		        versions.push(tags[t])
 	            }
             });
-            resolve(versions)
-        })
-        //Test version against current versions
-        let compatible = false
-        versions.forEach(v  => {
-             if (semver.satisfies(v, package['node-red'].version)){
-                 cli.log(`✅ Compatible with Node-RED v${v}`)
-                 compatible = true
-             } else {
-                 cli.warn(`NOT Compatible with Node-RED v${v}`)
-             }
-             if (!compatible){
-                 cli.error('Not Compatible with any current Node-RED versions')
-             }
-
+            //Test version against current versions
+            let compatible = false
+            versions.forEach(v  => {
+                if (semver.satisfies(v, package['node-red'].version)){
+                    cli.log(`✅ Compatible with Node-RED v${v}`)
+                    compatible = true
+                } else {
+                    cli.warn(`NOT Compatible with Node-RED v${v}`)
+                }
+                if (!compatible){
+                    cli.error('Not Compatible with any current Node-RED versions')
+                }
+            })
         })
         } else {
             cli.warn('Node-RED version compatiblity not declared')
@@ -122,15 +120,15 @@ function checkpackage(path, cli, scorecard) {
         //SHOULD declare min node version in engines
         scorecard.nodeversion
         if ( package.hasOwnProperty('engines') && package.engines.hasOwnProperty('node')){
-            const nrminversion = axios.get('https://registry.npmjs.org/node-red')
+            return axios.get('https://registry.npmjs.org/node-red')
             .then(response => {               
-                resolve(semver.minVersion(response.versions[response["dist-tags"].latest].engines.node.version))
+                nminversion = semver.minVersion(response.data.versions[response.data["dist-tags"].latest].engines.node)
+                if  (semver.satisfies(nminversion, package.engines.node)){
+                    cli.log('✅ Engine compatilble')   
+                } else {
+                    cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nrminversion)
+                }
             })
-            if  (semver.satisfies(nrminversion, package.engines.node)){
-                cli.log('✅ Engine compatilble')   
-            } else {
-                cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nrminversion)
-            }
         } else {    
             cli.warn('Node version not declared in engines')
         }  
