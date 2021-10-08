@@ -115,7 +115,7 @@ function checknodes(path, cli, scorecard) {
     const package = require(path+'/package.json');
     scorecard.nodes = {}
     return new Promise((resolve, reject) => {
-        cli.log('Validating Nodes')
+        cli.log('---Validating Nodes---')
         defs = {}
         Object.values(package['node-red'].nodes).forEach((n) =>{
             let htmlfile = path+"/"+n.replace(".js", ".html")
