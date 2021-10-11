@@ -9,7 +9,14 @@ const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   });
-   
+
+
+function isGitUrl(str) {
+  var regex = /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/;
+  return regex.test(str);
+};
+  
+
 function checkpackage(path, cli, scorecard) {
     const package = require(path+'/package.json');
     scorecard.package = {}
@@ -47,6 +54,11 @@ function checkpackage(path, cli, scorecard) {
                 fs.mkdirSync(repopath);
             } else{
                 fs.rmSync(repopath+'/', { recursive:true })
+            }
+            //Fix for repourls that contain credentials eg 'git@github.com:username/project.git'
+            if (repourl.indexOf('@') != -1){ repourl = 'https://'+repourl.replace(':', '/').split('@')[1]}
+            if (!isGitUrl(repourl)){
+                cli.error('Invalid Repository URL: '+ repourl)
             }
             return nodegit.Clone(repourl, repopath)
             .then(function (r){

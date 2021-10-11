@@ -6,9 +6,14 @@ const tar = require('tar')
 function getFromNPM(package, version) {
   const path = os.tmpdir()+'/'+package
   if (!fs.existsSync(path)){
-    fs.mkdirSync(path);
+    if (package.substr(0,1) === '@'){
+      fs.mkdirSync(os.tmpdir()+'/'+package.split('/')[0]);
+      fs.mkdirSync(os.tmpdir()+'/'+package);
+    } else {
+      fs.mkdirSync(path);
+    }
   }
-  const tarball = path+'/'+package+'.tgz';
+  const tarball = path+'/package.tgz';
   return axios.get('https://registry.npmjs.org/'+package)
     .then(response => {
         if (version === undefined){
