@@ -2,8 +2,8 @@ const {Command, flags} = require('@oclif/command')
 const getFromNPM = require('../libs/npmget')
 const checkpackage = require('../libs/checkpackage')
 const checknodes = require('../libs/checknodes')
-
 const fs = require('fs');
+const checkdeps = require('../libs/checkdeps');
 
 let path = ''
 
@@ -21,6 +21,9 @@ class ValidateCommand extends Command {
     await checkpackage(path, cli, scorecard)
     .then(scorecard => {
       return checknodes(path, cli, scorecard)
+    })
+    .then(scorecard => {
+      return checkdeps(path, cli, scorecard)
     })
     .then(() => {
       if (flags.card){
