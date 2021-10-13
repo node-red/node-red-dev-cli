@@ -42,12 +42,9 @@ function checkdeps(path, cli, scorecard) {
         .then(response => {
             const badpackages = response.data
             for (const [name, version] of Object.entries(package.dependencies)) {
-                console.log(name)
-                //return new Promise((resolve, reject) => {
-                return npmlsPromise(name, version, true).then((obj) => {
-                        console.log(obj)
-                        obj.forEach(i => {
-                            console.log(i)
+                return new Promise((resolve, reject) => {
+                    npmls(name, version, true, function(list) {
+                        list.forEach(i => {
                             if (i.indexOf('@') == 0) {
                                 n = '@'+i.split('@')[1]
                                 v = i.split('@')[2]
@@ -60,11 +57,17 @@ function checkdeps(path, cli, scorecard) {
                                 scorecard.dependencies.badpackages.test = false
                             }           
                         });
+                        resolve()
                     });
-            } 
+                })
+                }
+            
+        })
+        .then(() => {
             if (scorecard.dependencies.badpackages.test) {
                 cli.log((`✅ No incompatible pacakges found in dependency tree`))
             }
+            return
         }) 
     })
     .then(() => {
