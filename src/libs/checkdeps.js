@@ -9,8 +9,10 @@ const readline = require('readline').createInterface({
 const npmls = require('npm-remote-ls').ls;
 const { resolve } = require('path');
 const util = require('util');
+const npmCheck = require('npm-check');
+const { consumers } = require('stream');
+const semver = require('semver');
 
-const npmlsPromise = util.promisify(npmls);
 
   
 
@@ -53,7 +55,7 @@ function checkdeps(path, cli, scorecard) {
                                 v = i.split('@')[1]
                             }
                             if (Object.keys(badpackages).includes(n) && semver.satisfies(v, badpackages[n])){
-                                cli.error(`Incompatible package ${obj} found as dependency of ${name}`)
+                                cli.error(`Incompatible package ${i} found as dependency of ${name}`)
                                 scorecard.dependencies.badpackages.test = false
                             }           
                         });
@@ -69,6 +71,22 @@ function checkdeps(path, cli, scorecard) {
             }
             return
         }) 
+    })
+    .then(() => {
+        // Check if dependencies are out of date
+        scorecard.dependencies.latest = {'test' : true}
+        return npmCheck({cwd: path})
+            .then(currentState => {
+                currentState.get('packages').forEach((dep) => {
+                    if (!dep.easyUpgrade){
+                        cli.warn(`${dep.moduleName} is not at latest version, package.json specifies: ${dep.packageJson}, latest is: ${dep.latest}`)
+                        scorecard.dependencies.latest.test = false
+                    }
+                })
+                if (scorecard.dependencies.latest.test) {
+                    cli.log((`✅ All dependices using latest versions`))   
+                }
+            })
     })
     .then(() => {
         return scorecard

@@ -84,7 +84,7 @@ function checkpackage(path, cli, scorecard) {
             cli.log('✅ Package uses a Scoped Name')
             scorecard.package.scopedname = { 'test' : true}
         } else {
-            cli.warn('New Packages SHOULD use a scoped name')
+            cli.warn('New Packages should use a scoped name')
             scorecard.package.scopedname = { 'test' : false}
         }     
     })
