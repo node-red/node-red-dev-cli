@@ -14,7 +14,6 @@ const { consumers } = require('stream');
 const semver = require('semver');
 
 function checkdeps(path, cli, scorecard) {
-    console.log(path)
     const package = require(path+'/package.json');
     scorecard.dependencies = {}
     return new Promise((resolve, reject) => {
@@ -62,7 +61,8 @@ function checkdeps(path, cli, scorecard) {
                                 v = i.split('@')[1]
                             }
                             if (Object.keys(badpackages).includes(n) && semver.satisfies(v, badpackages[n])){
-                                cli.error(`Incompatible package ${i} found as dependency of ${name}`)
+                                cli.warn(`Incompatible package ${i} found as dependency of ${name}`)
+                                reject('Incompatible Pacakges Found')
                                 scorecard.dependencies.badpackages.test = false
                             }           
                         });
@@ -100,7 +100,7 @@ function checkdeps(path, cli, scorecard) {
     })
     .catch((e) => {
         cli.error(e);
-      });
+    });
 
 }
 

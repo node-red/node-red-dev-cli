@@ -177,29 +177,37 @@ function checknodes(path, cli, scorecard) {
         let checknodes = []
         // Example should be provided that uses each node (excluding config nodes)
         new Promise((resolve, reject) => {
-            let files = getAllFiles(path+'/examples')
+            files = []
+            if (fs.existsSync(path+'/examples')){
+                files = getAllFiles(path+'/examples')
+            }
             resolve(files)
         })
         .then((files) => {
-            Object.keys(defs).forEach((node) => {
-                if (defs[node].category != 'config'){
-                    checknodes.push(node)
-                }
-            })
-            files.forEach((file) => {
-                let example = JSON.parse(fs.readFileSync(file));
-                example.forEach((n) => {
-                    const index = checknodes.indexOf(n.type);
-                    if (index > -1) {
-                        checknodes.splice(index, 1);
+            if (files.length != 0){
+                Object.keys(defs).forEach((node) => {
+                    if (defs[node].category != 'config'){
+                        checknodes.push(node)
                     }
                 })
-            })
-            if (checknodes.length != 0){
-                cli.warn(`No examples found for the following nodes: ${checknodes.join(', ')}`)
+                files.forEach((file) => {
+                    let example = JSON.parse(fs.readFileSync(file));
+                    example.forEach((n) => {
+                        const index = checknodes.indexOf(n.type);
+                        if (index > -1) {
+                            checknodes.splice(index, 1);
+                        }
+                    })
+                })
+                if (checknodes.length != 0){
+                    cli.warn(`Examples not found for the following nodes: ${checknodes.join(', ')}`)
+                } else {
+                    cli.log('✅ Examples found for all nodes')
+                }
             } else {
-                cli.log('✅ Examples found for all nodes')
+                cli.warn('No examples found')
             }
+            
         })
     })
     .then(() => {
