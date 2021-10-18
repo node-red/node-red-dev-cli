@@ -13,10 +13,8 @@ const npmCheck = require('npm-check');
 const { consumers } = require('stream');
 const semver = require('semver');
 
-
-  
-
 function checkdeps(path, cli, scorecard) {
+    console.log(path)
     const package = require(path+'/package.json');
     scorecard.dependencies = {}
     return new Promise((resolve, reject) => {
@@ -26,7 +24,13 @@ function checkdeps(path, cli, scorecard) {
     .then(() => {
         // Should have 6 or less dependencies
         // 6 is based on the 95th percentile of all pacakges in catalog at Oct 2021, use https://flows.nodered.org/flow/df33d0171d3d095d7c7b70169b9aa759 to recalculate
-        let depcount = Object.keys(package.dependencies).length
+        let depcount
+        if (package.hasOwnProperty('dependencies')){
+            depcount = Object.keys(package.dependencies).length
+        } else {
+            depcount = 0
+        }
+    
         if (depcount <= 6) {
             cli.log(`✅ Package has ${depcount} dependencies`)
             scorecard.dependencies.count = {'test' : true}
@@ -40,6 +44,9 @@ function checkdeps(path, cli, scorecard) {
     .then(() => {
         //Check dependency tree doesn't contain known incompatible pacakges
         scorecard.dependencies.badpackages = {'test' : true}
+        if (!package.hasOwnProperty('dependencies')){
+            package.dependencies = []
+        }
         return axios.get('https://s3.sammachin.com/badpackages.json') // TODO Move to a node-red domain
         .then(response => {
             const badpackages = response.data

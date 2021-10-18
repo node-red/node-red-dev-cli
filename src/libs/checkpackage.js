@@ -138,7 +138,7 @@ function checkpackage(path, cli, scorecard) {
                 if  (semver.satisfies(nminversion, package.engines.node)){
                     cli.log('✅ Engine compatilble')   
                 } else {
-                    cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nrminversion)
+                    cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nminversion)
                 }
             })
         } else {    

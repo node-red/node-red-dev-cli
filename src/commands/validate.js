@@ -15,7 +15,10 @@ class ValidateCommand extends Command {
     const cli = this
     if (packagename) {
       path = await getFromNPM(packagename)
-    } else {
+    } else if (flags.path){
+      path = flags.path
+    } 
+    else {
       path = '.'
     }
     await checkpackage(path, cli, scorecard)

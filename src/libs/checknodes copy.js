@@ -2,8 +2,6 @@ const acorn = require('acorn');
 const walk = require("acorn-walk");
 const fs = require("fs");
 const axios = require('axios')
-const pth = require("path");
-const { pathToFileURL } = require('url');
 
 
 function getNodeDefinitions(filename) {
@@ -74,12 +72,6 @@ function getNodeDefinitions(filename) {
                                         } else {
                                             errors.push({ code:"outputs-not-inline" });
                                         }
-                                    } else if (nodeDef.key.name === 'category') {
-                                        if (nodeDef.value.type === 'Literal') {
-                                            defs[defType].category = nodeDef.value.value;
-                                        } else {
-                                            errors.push({ code:"category-not-inline" });
-                                        }
                                     }
                                 });
                             } else {
@@ -119,38 +111,19 @@ function getNodeDefinitions(filename) {
     return defs;
 }
 
-
-const getAllFiles = function(dirPath, arrayOfFiles) {
-  files = fs.readdirSync(dirPath)
-
-  arrayOfFiles = arrayOfFiles || []
-
-  files.forEach(function(file) {
-    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
-    } else {
-      arrayOfFiles.push(pth.join(dirPath, "/", file))
-    }
-  })
-
-  return arrayOfFiles
-}
-
-
-
 function checknodes(path, cli, scorecard) {
     const package = require(path+'/package.json');
     scorecard.nodes = {}
-    let defs = {}
     return new Promise((resolve, reject) => {
         cli.log('---Validating Nodes---')
+        defs = {}
         Object.values(package['node-red'].nodes).forEach((n) =>{
             let htmlfile = path+"/"+n.replace(".js", ".html")
             Object.assign(defs, getNodeDefinitions(htmlfile))
         })    
-        resolve();
+        resolve(defs);
       })
-    .then(() => {
+    .then((defs) => {
         // Nodes SHOULD use unique names
         const mynodes = Object.keys(defs)
         scorecard.nodes.uniqname = {test : true, nodes : []}
@@ -170,35 +143,6 @@ function checknodes(path, cli, scorecard) {
             if (scorecard.nodes.uniqname.test){
                 cli.log('✅ Nodes all have unique names') 
                 delete scorecard.nodes.uniqname.nodes
-            }
-        })
-    })
-    .then(() => {
-        let checknodes = []
-        // Example should be provided that uses each node (excluding config nodes)
-        new Promise((resolve, reject) => {
-            let files = getAllFiles(path+'/examples')
-            resolve(files)
-        })
-        .then((files) => {
-            Object.keys(defs).forEach((node) => {
-                if (defs[node].category != 'config'){
-                    checknodes.push(node)
-                }
-            })
-            files.forEach((file) => {
-                let example = JSON.parse(fs.readFileSync(file));
-                example.forEach((n) => {
-                    const index = checknodes.indexOf(n.type);
-                    if (index > -1) {
-                        checknodes.splice(index, 1);
-                    }
-                })
-            })
-            if (checknodes.length != 0){
-                cli.warn(`No examples found for the following nodes: ${checknodes.join(', ')}`)
-            } else {
-                cli.log('✅ Examples found for all nodes')
             }
         })
     })
