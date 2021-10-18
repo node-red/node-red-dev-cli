@@ -143,7 +143,7 @@ function checknodes(path, cli, scorecard) {
     scorecard.nodes = {}
     let defs = {}
     return new Promise((resolve, reject) => {
-        cli.log('---Validating Nodes---')
+        cli.log('    ---Validating Nodes---')
         Object.values(package['node-red'].nodes).forEach((n) =>{
             let htmlfile = path+"/"+n.replace(".js", ".html")
             Object.assign(defs, getNodeDefinitions(htmlfile))

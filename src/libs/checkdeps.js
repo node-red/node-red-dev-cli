@@ -17,7 +17,7 @@ function checkdeps(path, cli, scorecard) {
     const package = require(path+'/package.json');
     scorecard.dependencies = {}
     return new Promise((resolve, reject) => {
-        cli.log('---Validating Dependencies---')    
+        cli.log('    ---Validating Dependencies---')    
         resolve();
       })
     .then(() => {
@@ -46,7 +46,14 @@ function checkdeps(path, cli, scorecard) {
         if (!package.hasOwnProperty('dependencies')){
             package.dependencies = []
         }
-        return axios.get('https://s3.sammachin.com/badpackages.json') // TODO Move to a node-red domain
+        //return axios.get('https://s3.sammachin.com/badpackages.json') // TODO Move to a node-red domain
+        // for now use a local badpacakges file
+        return new Promise((resolve, reject) => {
+            let response = {}
+            response.data = JSON.parse(fs.readFileSync('badpackages.json'));
+            resolve(response);
+          })
+        // end 
         .then(response => {
             const badpackages = response.data
             for (const [name, version] of Object.entries(package.dependencies)) {
