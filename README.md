@@ -11,8 +11,8 @@ Node-RED Node Developer Tools
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
-* [Running](#running)
 <!-- tocstop -->
+
 # Usage
 <!-- usage -->
 ```sh-session
@@ -20,7 +20,7 @@ $ npm install -g node-red-dev
 $ node-red-dev COMMAND
 running command...
 $ node-red-dev (-v|--version|version)
-node-red-dev/0.0.1 darwin-x64 node-v14.15.3
+node-red-dev/0.0.5 darwin-x64 node-v14.15.3
 $ node-red-dev --help [COMMAND]
 USAGE
   $ node-red-dev COMMAND
@@ -29,10 +29,8 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-
 * [`node-red-dev help [COMMAND]`](#node-red-dev-help-command)
 * [`node-red-dev validate`](#node-red-dev-validate)
-
 
 ## `node-red-dev help [COMMAND]`
 
@@ -54,35 +52,21 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3
 ## `node-red-dev validate`
 
 Run the full suite of Validation tests
-...
-By default the tool will look in the current folder for a package, 
-you can also specify a path with --path or a published npm package with --npm
-`
+
 ```
 USAGE
   $ node-red-dev validate
 
 OPTIONS
-  --npm=package  name of a package on npm to validate
-  --path=path Path to a package on the local filesystem to validate (defaults to ./)
+  -c, --card=card  Path to write scorecard.json
+  -n, --npm=npm    Name of package on npm to validate
+  -p, --path=path  Path of package  to validate
 
 DESCRIPTION
   ...
-  Extra documentation goes here
+  By default the tool will look in the current folder for a package, 
+  you can also specify a path with --path or a published npm package with --npm.
 ```
 
-_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev/blob/v0.0.1/src/commands/validate.js)_
+_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.0.5/src/commands/validate.js)_
 <!-- commandsstop -->
-
-
-# Running
-<!-- running -->
-_Eventually the tool will be published on NPM but these instructions are for installing and running from source_
-
-Clone the repo and install dependencies by running `npm install`
-
-You can then test the command using `./bin/run [COMMAND]`
-
-If you want to test the command globally run `npm link` from the project folder and it will create a symlink for `node-red-dev` in the global folder. 
-
-<!-- runningstop -->

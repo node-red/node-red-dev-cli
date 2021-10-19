@@ -50,7 +50,7 @@ function checkdeps(path, cli, scorecard) {
         // for now use a local badpacakges file
         return new Promise((resolve, reject) => {
             let response = {}
-            response.data = JSON.parse(fs.readFileSync('badpackages.json'));
+            response.data = JSON.parse(fs.readFileSync(__dirname+'/../badpackages.json'));
             resolve(response);
           })
         // end 
