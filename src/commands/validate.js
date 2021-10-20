@@ -19,7 +19,7 @@ class ValidateCommand extends Command {
       path = flags.path
     } 
     else {
-      path = '.'
+      path = process.cwd()
     }
     await checkpackage(path, cli, scorecard)
     .then(scorecard => {
