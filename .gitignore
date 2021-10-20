@@ -1,0 +1,11 @@
+*-debug.log
+*-error.log
+/.nyc_output
+/dist
+/tmp
+/yarn.lock
+node_modules
+.DS_Store
+.gitconfig
+package-lock.json
+test.js

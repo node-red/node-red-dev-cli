@@ -1,0 +1,63 @@
+{
+  "name": "node-red-dev",
+  "description": "Node-RED Node Developer Tools",
+  "version": "0.0.5",
+  "author": "Sam Machin @sammachin",
+  "bin": {
+    "node-red-dev": "./bin/run"
+  },
+  "bugs": "https://github.com/node-red/node-red-dev/issues",
+  "dependencies": {
+    "@oclif/command": "^1.8.0",
+    "@oclif/config": "^1.17.0",
+    "@oclif/plugin-help": "^3.2.3",
+    "npm-check": "^5.9.2",
+    "npm-remote-ls": "^1.3.2",
+    "acorn": "^8.4.1",
+    "acorn-walk": "^8.1.1",
+    "axios": "^0.21.4",
+    "nodegit": "^0.27.0",
+    "semver": "^7.3.5",
+    "tar": "^6.1.11"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.26.0",
+    "@oclif/test": "^1.2.8",
+    "chai": "^4.3.4",
+    "eslint": "^5.16.0",
+    "eslint-config-oclif": "^3.1.0",
+    "globby": "^10.0.2",
+    "mocha": "^5.2.0",
+    "nyc": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/node-red/node-red-dev-cli",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "Apache-2.0",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "node-red-dev",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "node-red/node-red-dev-cli",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint .",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "version": "oclif-dev readme && git add README.md"
+  }
+}
