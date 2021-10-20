@@ -4,6 +4,7 @@ const checkpackage = require('../libs/checkpackage')
 const checknodes = require('../libs/checknodes')
 const fs = require('fs');
 const checkdeps = require('../libs/checkdeps');
+const p = require('path');
 
 let path = ''
 
@@ -16,7 +17,11 @@ class ValidateCommand extends Command {
     if (packagename) {
       path = await getFromNPM(packagename)
     } else if (flags.path){
-      path = flags.path
+      if(p.isAbsolute(flags.path)) {
+        path = flags.path
+      } else {
+        path = process.cwd()+'/'+flags.path
+      }
     } 
     else {
       path = process.cwd()
