@@ -47,7 +47,8 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
         }
       })
     .then(() => {
-         //Check package in repository is the same name as the package.json (check for forks) - This may need more thought and testing
+         // Check package in repository is the same name as the package.json (check for forks) - This may need more thought and testing
+         // Need to rethink this test due to mono-repos, not listed repos etc, 
         if (package.hasOwnProperty('repository')){
             let repourl = package.repository.url
             let repo = p.basename(repourl)
@@ -64,27 +65,33 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             }
             return nodegit.Clone(repourl, repopath)
             .then(function (r){
-                let path = r.workdir()
+                if (package.repository.hasOwnProperty('directory')){
+                    let path = r.workdir()+package.repository.directory
+                } else{
+                    let path = r.workdir()
+                }
                 let repopackage = require(path+'/package.json')
                 if (package.name != repopackage.name){
-                    cli.warn('Package name differes from package in repository')
-                    readline.question('Is this a fork of an existing package?', note => {
-                        scorecard.package.name = { 'test' : false, 'note' : note}
-                        readline.close();
-                    });
+                    cli.warn('Package name does not match package.json in repository')
                 } else {
                     cli.log('✅ Package Name Matches Repository')
                     scorecard.package.name = {'test' : true}
                 }
-        })
-    }
+            })
+            .catch((e) =>{
+                cli.error('Failed to clone git repository '+e)
+            })
+        } else {
+            cli.warn('No Repository listed in package.json')
+        }
+
     })
     .then(() => {
         let legacy = false
         const scopedRegex = new RegExp('@[a-z\\d][\\w-.]+/[a-z\\d][\\w-.]*');
         if (npm_metadata){
-            //New pacakges should Use a Scoped name
-            let scoped_start= Date.parse('2021-11-01T00:00:00.000Z') //Pacakges should use scoped from 1st Nov 2021
+            //New packages should Use a Scoped name
+            let scoped_start= Date.parse('2021-12-01T00:00:00.000Z') //Packages should use scoped from 1st Dec 2021
             let created = Date.parse(npm_metadata.time.created)
             if (created<scoped_start){
                 legacy = true
@@ -110,11 +117,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             }
 
 
-        }
-        
-
-
-         
+        }         
     })
     .then(() => {
         //Check for other package of same name in different scope, ask about fork?
@@ -134,11 +137,6 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             if (similar){
                 scorecard.package.uniqname.test = false
                 scorecard.package.uniqname.similar = similarlist
-                readline.question('Add a note about the package name?', note => {
-                    scorecard.package.uniqname.note =  note
-                    readline.close();
-                });
-
             } else {
                 cli.log('✅ No similar named packages found')
             }
@@ -152,7 +150,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
         cli.log(`✅ Node-RED Keyword Found`)
         scorecard.package.keyword = { 'test' : true}
     } else {
-        cli.error('Keywords MUST contain node-red')
+        cli.warn('Package.json keywords MUST contain node-red')
     }   
     })
     .then(() => {
@@ -178,7 +176,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                     cli.warn(`NOT Compatible with Node-RED v${v}`)
                 }
                 if (!compatible){
-                    cli.error('Not Compatible with any current Node-RED versions')
+                    cli.warn('Not Compatible with any current Node-RED versions')
                 }
             })
         })
