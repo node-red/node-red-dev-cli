@@ -7,6 +7,12 @@ const readline = require('readline').createInterface({
     output: process.stdout
   });
 const npmls = require('npm-remote-ls').ls;
+//let npmls_config = require('npm-remote-ls').config 
+//npmls_config({
+//  development: false,
+//  optional: false
+//})
+ 
 const { resolve } = require('path');
 const util = require('util');
 const npmCheck = require('npm-check');
@@ -89,7 +95,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
     .then(() => {
         // Check if dependencies are out of date
         scorecard.dependencies.latest = {'test' : true}
-        return npmCheck({cwd: path})
+        return npmCheck({cwd: path, ignoreDev: true})
             .then(currentState => {
                 currentState.get('packages').forEach((dep) => {
                     if (!dep.easyUpgrade){
@@ -98,7 +104,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                     }
                 })
                 if (scorecard.dependencies.latest.test) {
-                    cli.log((`✅ All dependices using latest versions`))   
+                    cli.log((`✅ All prod dependencies using latest versions`))   
                 }
             })
     })
