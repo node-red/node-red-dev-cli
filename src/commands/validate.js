@@ -52,7 +52,13 @@ class ValidateCommand extends Command {
     }
     await checkpackage(path, cli, scorecard, npm_metadata)
     .then(scorecard => {
-      return checknodes(path, cli, scorecard, npm_metadata)
+      let pkg = require(path+'/package.json')
+      if (!pkg['node-red'].hasOwnProperty('nodes')){ //If no nodes declared skip node validation (could be a plugin)
+        cli.warn('No nodes declared in package.json')
+        return(scorecard)
+      } else{
+        return checknodes(path, cli, scorecard, npm_metadata)
+      }
     })
     .then(scorecard => {
       return checkdeps(path, cli, scorecard, npm_metadata)
