@@ -1,7 +1,7 @@
 {
   "name": "node-red-dev",
   "description": "Node-RED Node Developer Tools",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Sam Machin @sammachin",
   "bin": {
     "node-red-dev": "./bin/run"
