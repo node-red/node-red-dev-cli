@@ -138,7 +138,7 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 
 
 
-function checknodes(path, cli, scorecard) {
+function checknodes(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
     scorecard.nodes = {}
     let defs = {}

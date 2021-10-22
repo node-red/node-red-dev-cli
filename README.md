@@ -58,8 +58,8 @@ USAGE
   $ node-red-dev validate
 
 OPTIONS
-  -c, --card=card  Path to write scorecard.json
-  -n, --npm=npm    Name of package on npm to validate
+  -o, --output=card  Path to write scorecard.json
+  -npm, --npm=npm    Name of package on npm to validate
   -p, --path=path  Path of package  to validate
 
 DESCRIPTION

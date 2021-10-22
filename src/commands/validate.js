@@ -8,30 +8,54 @@ const p = require('path');
 
 let path = ''
 
+
+function parsePackage(i){
+  
+  return [n,v]
+}
+
+
 class ValidateCommand extends Command {
   async run() {
     const {flags} = this.parse(ValidateCommand)
-    const packagename = flags.npm
-    let scorecard = {}
     const cli = this
-    if (packagename) {
-      path = await getFromNPM(packagename)
+    const npmstring = flags.npm
+    let scorecard = {}
+    let packagename
+    let version
+    let npm_metadata
+    if (npmstring){
+      if (npmstring.includes('@')){
+        if (npmstring.indexOf('@') == 0) {
+          packagename = '@'+npmstring.split('@')[1]
+          version = npmstring.split('@')[2]
+        } else{
+          packagename = npmstring.split('@')[0]
+          version = npmstring.split('@')[1]
+        }
+      } else {
+        packagename = npmstring
+        version = false
+      }
+      [path, npm_metadata] = await getFromNPM(packagename, version)
     } else if (flags.path){
       if(p.isAbsolute(flags.path)) {
+        npm_metadata = false
         path = flags.path
       } else {
+        npm_metadata = false
         path = process.cwd()+'/'+flags.path
       }
     } 
     else {
       path = process.cwd()
     }
-    await checkpackage(path, cli, scorecard)
+    await checkpackage(path, cli, scorecard, npm_metadata)
     .then(scorecard => {
-      return checknodes(path, cli, scorecard)
+      return checknodes(path, cli, scorecard, npm_metadata)
     })
     .then(scorecard => {
-      return checkdeps(path, cli, scorecard)
+      return checkdeps(path, cli, scorecard, npm_metadata)
     })
     .then(() => {
       if (flags.card){
@@ -62,9 +86,9 @@ you can also specify a path with --path or a published npm package with --npm.
 `
 
 ValidateCommand.flags = {
-  npm: flags.string({char: 'npm', description: 'Name of package on npm to validate'}),
-  path: flags.string({char: 'path', description: 'Path of package  to validate'}),
-  card: flags.string({char: 'card', description: 'Path to write scorecard.json'}),
+  npm: flags.string({char: 'n', description: 'Name of package on npm to validate'}),
+  path: flags.string({char: 'p', description: 'Path of package  to validate'}),
+  card: flags.string({char: 'o', description: 'Path to write scorecard.json'}),
 }
 
 

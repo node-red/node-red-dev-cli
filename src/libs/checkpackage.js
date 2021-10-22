@@ -18,11 +18,12 @@ function isGitUrl(str) {
 };
   
 
-function checkpackage(path, cli, scorecard) {
+function checkpackage(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
     scorecard.package = {}
     return new Promise((resolve, reject) => {
-        cli.log('    ---Validating Package---')    
+        cli.log('    ---Validating Package---')
+        cli.log(`   ${package.name}@${package.version}`)    
         resolve();
       })
     .then(() => {
@@ -41,7 +42,7 @@ function checkpackage(path, cli, scorecard) {
             cli.log(`✅ Repository/Bugs Link Supplied`)
             scorecard.package.bugs = {'test' : true}
         } else {
-            cli.error('Please provide either a repository URL or a Bugs URL/Email')
+            cli.warn('Please provide either a repository URL or a Bugs URL/Email')
             scorecard.package.bugs = {'test' : false}
         }
       })
@@ -79,15 +80,71 @@ function checkpackage(path, cli, scorecard) {
     }
     })
     .then(() => {
-        //SHOULD Use a Scoped name
+        let legacy = false
         const scopedRegex = new RegExp('@[a-z\\d][\\w-.]+/[a-z\\d][\\w-.]*');
-        if (scopedRegex.test(package.name)){
-            cli.log('✅ Package uses a Scoped Name')
-            scorecard.package.scopedname = { 'test' : true}
-        } else {
-            cli.warn('New Packages should use a scoped name')
-            scorecard.package.scopedname = { 'test' : false}
-        }     
+        if (npm_metadata){
+            //New pacakges should Use a Scoped name
+            let scoped_start= Date.parse('2021-11-01T00:00:00.000Z') //Pacakges should use scoped from 1st Nov 2021
+            let created = Date.parse(npm_metadata.time.created)
+            if (created<scoped_start){
+                legacy = true
+            }
+        }
+        if (!legacy){
+            if (scopedRegex.test(package.name)){
+                cli.log('✅ Package uses a Scoped Name')
+                scorecard.package.name = { 'test' : true}
+            } else {
+                cli.warn('New Packages should use a scoped name')
+                scorecard.package.name = { 'test' : false}
+            }    
+        }
+        if (!scopedRegex.test(package.name)) {
+            const contribRegex = new RegExp('/^(node-red|nodered)(?!-contrib-).*/ig')
+            if (contribRegex.test(package.name)){
+                cli.warn('Packages using the node-red prefix in their name must use node-red-contrib')
+                scorecard.package.name = { 'test' : false}
+            } else {
+                cli.log('✅ Package uses a valid name')
+                scorecard.package.name = { 'test' : true}
+            }
+
+
+        }
+        
+
+
+         
+    })
+    .then(() => {
+        //Check for other package of same name in different scope, ask about fork?
+        scorecard.package.uniqname = {test : true}
+        const name = package.name.split('/').slice(-1) // Package name without scope
+        let similar = false
+        let similarlist = []
+        return axios.get('https://catalogue.nodered.org/catalogue.json')
+        .then(response => {               
+            response.data.modules.forEach((m) => {
+                if (name.includes(m.id.split('/').slice(-1))){
+                    cli.warn(`Similar named package found at ${m.id}`)
+                    similar = true
+                    similarlist.push(m.id)
+                }
+            })
+            if (similar){
+                scorecard.package.uniqname.test = false
+                scorecard.package.uniqname.similar = similarlist
+                readline.question('Add a note about the package name?', note => {
+                    scorecard.package.uniqname.note =  note
+                    readline.close();
+                });
+
+            } else {
+                cli.log('✅ No similar named packages found')
+            }
+            return similar
+        })
+        scorecard.package.uniqname.test = !test
     })
     .then(() => {
        //MUST have Node-RED in keywords
@@ -137,7 +194,7 @@ function checkpackage(path, cli, scorecard) {
             .then(response => {               
                 nminversion = semver.minVersion(response.data.versions[response.data["dist-tags"].latest].engines.node)
                 if  (semver.satisfies(nminversion, package.engines.node)){
-                    cli.log('✅ Engine compatilble')   
+                    cli.log(`✅ Compatible NodeJS Version found ${nminversion}`)   
                 } else {
                     cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nminversion)
                 }
@@ -145,36 +202,6 @@ function checkpackage(path, cli, scorecard) {
         } else {    
             cli.warn('Node version not declared in engines')
         }  
-    })
-    .then(() => {
-        //Check for other package of same name in different scope, ask about fork?
-        scorecard.package.uniqname = {test : true}
-        const name = package.name.split('/').slice(-1) // Package name without scope
-        let similar = false
-        let similarlist = []
-        return axios.get('https://catalogue.nodered.org/catalogue.json')
-        .then(response => {               
-            response.data.modules.forEach((m) => {
-                if (name.includes(m.id.split('/').slice(-1))){
-                    cli.warn(`Similar named package found at ${m.id}`)
-                    similar = true
-                    similarlist.push(m.id)
-                }
-            })
-            if (similar){
-                scorecard.package.uniqname.test = false
-                scorecard.package.uniqname.similar = similarlist
-                readline.question('Add a note about the package name?', note => {
-                    scorecard.package.uniqname.note =  note
-                    readline.close();
-                });
-
-            } else {
-                cli.log('✅ No similar named packages found')
-            }
-            return similar
-        })
-        scorecard.package.uniqname.test = !test
     })
     .then(() => {
         return scorecard

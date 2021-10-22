@@ -13,7 +13,7 @@ const npmCheck = require('npm-check');
 const { consumers } = require('stream');
 const semver = require('semver');
 
-function checkdeps(path, cli, scorecard) {
+function checkdeps(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
     scorecard.dependencies = {}
     return new Promise((resolve, reject) => {
