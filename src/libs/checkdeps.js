@@ -28,7 +28,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
       })
     .then(() => {
         // Should have 6 or less dependencies
-        // 6 is based on the 95th percentile of all pacakges in catalog at Oct 2021, use https://flows.nodered.org/flow/df33d0171d3d095d7c7b70169b9aa759 to recalculate
+        // 6 is based on the 95th percentile of all packages in catalog at Oct 2021, use https://flows.nodered.org/flow/df33d0171d3d095d7c7b70169b9aa759 to recalculate
         let depcount
         if (package.hasOwnProperty('dependencies')){
             depcount = Object.keys(package.dependencies).length
@@ -47,7 +47,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
         }
       })
     .then(() => {
-        //Check dependency tree doesn't contain known incompatible pacakges
+        //Check dependency tree doesn't contain known incompatible packages
         scorecard.dependencies.badpackages = {'test' : true}
         if (!package.hasOwnProperty('dependencies')){
             package.dependencies = []
@@ -75,7 +75,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                             }
                             if (Object.keys(badpackages).includes(n) && semver.satisfies(v, badpackages[n])){
                                 cli.warn(`Incompatible package ${i} found as dependency of ${name}`)
-                                reject('Incompatible Pacakges Found')
+                                reject('Incompatible Packages Found')
                                 scorecard.dependencies.badpackages.test = false
                             }           
                         });
@@ -87,7 +87,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
         })
         .then(() => {
             if (scorecard.dependencies.badpackages.test) {
-                cli.log((`✅ No incompatible pacakges found in dependency tree`))
+                cli.log((`✅ No incompatible packages found in dependency tree`))
             }
             return
         }) 
@@ -95,8 +95,8 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
     .then(() => {
         // Check if dependencies are out of date
         scorecard.dependencies.latest = {'test' : true}
-        return npmCheck({cwd: path, ignoreDev: true})
-            .then(currentState => {
+        return npmCheck({cwd: path, skipUnused: true})
+           .then(currentState => {
                 currentState.get('packages').forEach((dep) => {
                     if (!dep.easyUpgrade){
                         cli.warn(`${dep.moduleName} is not at latest version, package.json specifies: ${dep.packageJson}, latest is: ${dep.latest}`)

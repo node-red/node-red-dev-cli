@@ -159,7 +159,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             return axios.get('https://registry.npmjs.org/node-red')
             .then(response => {
             let tags = response.data['dist-tags']
-            let supportedRegex = new RegExp('.*maintenance.*|^latest$') // check which versions have a latest or maintaince tag
+            let supportedRegex = new RegExp('.*maintenance.*|^latest$') // check which versions have a latest or maintenance tag
             let versions = []
             Object.keys(tags).forEach(t => {
 	            if (supportedRegex.test(t)) {
@@ -181,7 +181,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             })
         })
         } else {
-            cli.warn('Node-RED version compatiblity not declared')
+            cli.warn('Node-RED version compatibility not declared')
         }    
     })
     .then(() => {
