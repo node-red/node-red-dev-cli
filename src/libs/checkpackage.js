@@ -194,7 +194,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                 if  (semver.satisfies(nminversion, package.engines.node)){
                     cli.log(`✅ Compatible NodeJS Version found ${nminversion}`)   
                 } else {
-                    cli.error('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nminversion)
+                    cli.warn('Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nminversion)
                 }
             })
         } else {    

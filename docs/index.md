@@ -1,11 +1,11 @@
 
  ## Package.json Checks
 
-[001 Repository or Bugs url/email](001.md)
-[002 Check package in repository is the same name as the package.json (check for forks)(002.md)
-[003 License]
-[004 Scoped Name]
-[005 MUST have Node-RED in keywords]
-[SHOULD declare min node-red version in node-red]
-[SHOULD declare min node version in engines]
-[Check for other package of same name in different scope, ask about fork?]
+[P01 License](P01.md)
+[P02 Check package name in repository](P02.md)
+[P03 Repository or Bugs url/email](P03.md)
+[P04 Naming](P04.md)
+[P05 Node-RED Keyword](P05.md)
+[P06 Min node-red version](P06.md)
+[P07 Min node version](P07.md)
+[P08 Similar Names](P08.md)
