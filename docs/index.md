@@ -9,3 +9,13 @@
 [P06 Min node-red version](P06.md)
 [P07 Min node version](P07.md)
 [P08 Similar Names](P08.md)
+
+## Node Checks
+
+[N01 Node Names](N01.md)
+[N02 Examples](N02.md)
+
+## Dependencies
+[D01 Number of Dependencies](D01.md)
+[D02 Bad Packages](D02.md)
+[D03 Out of Date Dependencies](D03.md)
