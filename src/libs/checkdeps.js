@@ -21,13 +21,12 @@ const semver = require('semver');
 
 function checkdeps(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
-    scorecard.dependencies = {}
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Dependencies---')    
         resolve();
       })
     .then(() => {
-        // Should have 6 or less dependencies
+        // Should have 6 or less dependencies D01
         // 6 is based on the 95th percentile of all packages in catalog at Oct 2021, use https://flows.nodered.org/flow/df33d0171d3d095d7c7b70169b9aa759 to recalculate
         let depcount
         if (package.hasOwnProperty('dependencies')){
@@ -38,17 +37,17 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
     
         if (depcount <= 6) {
             cli.log(`✅ Package has ${depcount} dependencies`)
-            scorecard.dependencies.count = {'test' : true}
-            scorecard.dependencies.count.total = depcount
+            scorecard.D01 = {'test' : true}
+            scorecard.D01.total = depcount
         } else {
-            cli.warn(`Package has a large number of dependencies (${depcount}), are these all needed?`)
-            scorecard.dependencies.count = {'test' : false}
-            scorecard.dependencies.count.total = depcount
+            cli.warn(`D01 Package has a large number of dependencies (${depcount})`)
+            scorecard.D01 = {'test' : false}
+            scorecard.D01.total = depcount
         }
       })
     .then(() => {
         //Check dependency tree doesn't contain known incompatible packages
-        scorecard.dependencies.badpackages = {'test' : true}
+        scorecard.D02 = {'test' : true, packages : []}
         if (!package.hasOwnProperty('dependencies')){
             package.dependencies = []
         }
@@ -56,12 +55,12 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
         // for now use a local badpacakges file
         return new Promise((resolve, reject) => {
             let response = {}
-            response.data = JSON.parse(fs.readFileSync(__dirname+'/../badpackages.json'));
+            response = JSON.parse(fs.readFileSync(__dirname+'/../badpackages.json'));
             resolve(response);
           })
         // end 
         .then(response => {
-            const badpackages = response.data
+            const badpackages = response
             for (const [name, version] of Object.entries(package.dependencies)) {
                 return new Promise((resolve, reject) => {
                     npmls(name, version, true, function(list) {
@@ -74,9 +73,10 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                                 v = i.split('@')[1]
                             }
                             if (Object.keys(badpackages).includes(n) && semver.satisfies(v, badpackages[n])){
-                                cli.warn(`Incompatible package ${i} found as dependency of ${name}`)
+                                cli.warn(`D02 Incompatible package ${i} found as dependency of ${name}`)
                                 reject('Incompatible Packages Found')
-                                scorecard.dependencies.badpackages.test = false
+                                scorecard.D02.test = false
+                                scorecard.D02.packages.push(i)
                             }           
                         });
                         resolve()
@@ -86,25 +86,28 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
             
         })
         .then(() => {
-            if (scorecard.dependencies.badpackages.test) {
+            if (scorecard.D02.test) {
                 cli.log((`✅ No incompatible packages found in dependency tree`))
+                delete scorecard.D02.packages
             }
             return
         }) 
     })
     .then(() => {
         // Check if dependencies are out of date
-        scorecard.dependencies.latest = {'test' : true}
+        scorecard.D03 = {'test' : true, packages : []}
         return npmCheck({cwd: path, skipUnused: true})
            .then(currentState => {
                 currentState.get('packages').forEach((dep) => {
                     if (!dep.easyUpgrade){
-                        cli.warn(`${dep.moduleName} is not at latest version, package.json specifies: ${dep.packageJson}, latest is: ${dep.latest}`)
-                        scorecard.dependencies.latest.test = false
+                        cli.warn(`D03 ${dep.moduleName} is not at latest version, package.json specifies: ${dep.packageJson}, latest is: ${dep.latest}`)
+                        scorecard.D03.test = false
+                        scorecard.D03.packages.push(dep.packageJson)
                     }
                 })
-                if (scorecard.dependencies.latest.test) {
-                    cli.log((`✅ All prod dependencies using latest versions`))   
+                if (scorecard.D03.test) {
+                    cli.log((`✅ All prod dependencies using latest versions`))
+                    delete scorecard.D03.packages
                 }
             })
     })

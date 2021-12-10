@@ -66,9 +66,9 @@ class ValidateCommand extends Command {
     .then(() => {
       if (flags.output){
         try {
-          fs.writeFileSync(flags.output+'/scorecard.json', JSON.stringify(scorecard))
+          fs.writeFileSync(flags.output, JSON.stringify(scorecard))
         } catch (err) {
-          cli.error(err) . m
+          cli.error(err)
         }
       }
     })
@@ -79,7 +79,9 @@ class ValidateCommand extends Command {
     .then(() =>{
       cli.log('Complete')
     })
-    cli.exit()
+    if (!flags.embed){
+      cli.exit()
+    }
   }
 }
 
@@ -94,7 +96,8 @@ you can also specify a path with --path or a published npm package with --npm.
 ValidateCommand.flags = {
   npm: flags.string({char: 'n', description: 'Name of package on npm to validate'}),
   path: flags.string({char: 'p', description: 'Path of package  to validate'}),
-  output: flags.string({char: 'o', description: 'Path to write scorecard.json'}),
+  output: flags.string({char: 'o', description: 'Path to write scorecard file to'}),
+  embed: flags.string({char: 'e', description: 'use when running embedded in anothe node app'}),
 }
 
 

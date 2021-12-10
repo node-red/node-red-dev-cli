@@ -1,7 +1,7 @@
 {
   "name": "node-red-dev",
   "description": "Node-RED Node Developer Tools",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "author": "Sam Machin @sammachin",
   "bin": {
     "node-red-dev": "./bin/run"
@@ -16,7 +16,6 @@
     "acorn": "^8.4.1",
     "acorn-walk": "^8.1.1",
     "axios": "^0.21.4",
-    "nodegit": "^0.27.0",
     "semver": "^7.3.5",
     "tar": "^6.1.11"
   },
