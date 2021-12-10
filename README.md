@@ -20,7 +20,7 @@ $ npm install -g node-red-dev
 $ node-red-dev COMMAND
 running command...
 $ node-red-dev (-v|--version|version)
-node-red-dev/0.0.11-alpha.4 darwin-arm64 node-v16.13.0
+node-red-dev/0.0.12 darwin-arm64 node-v16.13.0
 $ node-red-dev --help [COMMAND]
 USAGE
   $ node-red-dev COMMAND
@@ -69,5 +69,5 @@ DESCRIPTION
   you can also specify a path with --path or a published npm package with --npm.
 ```
 
-_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.0.11-alpha.4/src/commands/validate.js)_
+_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.0.12/src/commands/validate.js)_
 <!-- commandsstop -->
