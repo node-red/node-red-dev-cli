@@ -20,7 +20,7 @@ $ npm install -g node-red-dev
 $ node-red-dev COMMAND
 running command...
 $ node-red-dev (-v|--version|version)
-node-red-dev/0.0.5 darwin-x64 node-v14.15.3
+node-red-dev/0.0.12 darwin-arm64 node-v16.13.0
 $ node-red-dev --help [COMMAND]
 USAGE
   $ node-red-dev COMMAND
@@ -58,9 +58,10 @@ USAGE
   $ node-red-dev validate
 
 OPTIONS
-  -c, --card=card  Path to write scorecard.json
-  -n, --npm=npm    Name of package on npm to validate
-  -p, --path=path  Path of package  to validate
+  -e, --embed=embed    use when running embedded in anothe node app
+  -n, --npm=npm        Name of package on npm to validate
+  -o, --output=output  Path to write scorecard file to
+  -p, --path=path      Path of package  to validate
 
 DESCRIPTION
   ...
@@ -68,5 +69,5 @@ DESCRIPTION
   you can also specify a path with --path or a published npm package with --npm.
 ```
 
-_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.0.5/src/commands/validate.js)_
+_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.0.12/src/commands/validate.js)_
 <!-- commandsstop -->

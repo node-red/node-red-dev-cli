@@ -5,6 +5,7 @@ const tar = require('tar')
 
 function getFromNPM(package, version) {
   const path = os.tmpdir()+'/'+package
+  let npm_metadata = false
   if (!fs.existsSync(path)){
     if (package.substr(0,1) === '@'){
       fs.mkdirSync(os.tmpdir()+'/'+package.split('/')[0]);
@@ -16,7 +17,8 @@ function getFromNPM(package, version) {
   const tarball = path+'/package.tgz';
   return axios.get('https://registry.npmjs.org/'+package)
     .then(response => {
-        if (version === undefined){
+        npm_metadata = response.data
+        if (!version){
             version = response.data['dist-tags'].latest
         }
         var tarballUrl = response.data.versions[version].dist.tarball;
@@ -32,7 +34,7 @@ function getFromNPM(package, version) {
               else {
                 return tar.x({ file: tarball,  cwd: path, sync: false, strip: 1 })
                 .then(r => {
-                  resolve(path)
+                  resolve([path, npm_metadata])
                 })
               }                     
             });

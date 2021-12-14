@@ -138,9 +138,8 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 
 
 
-function checknodes(path, cli, scorecard) {
-    const package = require(path+'/package.json');
-    scorecard.nodes = {}
+function checknodes(path, cli, scorecard, npm_metadata) {
+    const package = require(path+'/package.json')
     let defs = {}
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Nodes---')
@@ -151,25 +150,25 @@ function checknodes(path, cli, scorecard) {
         resolve();
       })
     .then(() => {
-        // Nodes SHOULD use unique names
+        // Nodes SHOULD use unique names N01
         const mynodes = Object.keys(defs)
-        scorecard.nodes.uniqname = {test : true, nodes : []}
+        scorecard.N01 = {test : true, nodes : []}
         return axios.get('https://catalogue.nodered.org/catalogue.json')
         .then(response => {
             response.data.modules.forEach((m) => {
                 m.types.forEach((nodename) => {
                     if (mynodes.includes(nodename) && m.id != package.name){
-                        scorecard.nodes.uniqname.test = false
-                        scorecard.nodes.uniqname.nodes.push(m.id)
+                        scorecard.N01.test = false
+                        scorecard.N01.nodes.push(m.id)
                         cli.warn(`Duplicate nodename ${nodename} found in package ${m.id}`)
                     }
                 })
             })  
         })
         .then(() => {
-            if (scorecard.nodes.uniqname.test){
+            if (scorecard.N01.test){
                 cli.log('✅ Nodes all have unique names') 
-                delete scorecard.nodes.uniqname.nodes
+                delete scorecard.N01.nodes
             }
         })
     })
@@ -190,6 +189,7 @@ function checknodes(path, cli, scorecard) {
                         checknodes.push(node)
                     }
                 })
+                allnodes = [...checknodes]
                 files.forEach((file) => {
                     let example = JSON.parse(fs.readFileSync(file));
                     example.forEach((n) => {
@@ -199,13 +199,19 @@ function checknodes(path, cli, scorecard) {
                         }
                     })
                 })
+                let examplenodes = allnodes.filter(x => !checknodes.includes(x))
                 if (checknodes.length != 0){
                     cli.warn(`Examples not found for the following nodes: ${checknodes.join(', ')}`)
+                    scorecard.N02 = {test : false}
+                    scorecard.N02.nodes = examplenodes
                 } else {
                     cli.log('✅ Examples found for all nodes')
+                    scorecard.N02 = {test : true}
+                    scorecard.N02.nodes = examplenodes
                 }
             } else {
                 cli.warn('No examples found')
+                scorecard.N02 = {test : false}
             }
             
         })
