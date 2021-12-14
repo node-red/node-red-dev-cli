@@ -94,7 +94,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
         const scopedRegex = new RegExp('@[a-z\\d][\\w-.]+/[a-z\\d][\\w-.]*');
         if (npm_metadata){
             //New packages should Use a Scoped name
-            let scoped_start= Date.parse('2021-12-01T00:00:00.000Z') //Packages should use scoped from 1st Dec 2021
+            let scoped_start= Date.parse('2022-02-01T00:00:00.000Z') //New Packages should use scoped names from 1st Feb 2021
             let created = Date.parse(npm_metadata.time.created)
             if (created<scoped_start){
                 legacy = true
