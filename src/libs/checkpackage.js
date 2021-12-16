@@ -32,7 +32,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             cli.log(`✅ Package is ${package.license} licensed`)
             scorecard.P01 = {'test' : true, 'license' : package.license}
         } else {
-            cli.error('No License Specified')
+            cli.warn('No License Specified')
             scorecard.P01 = {'test' : false}
         }
       })
