@@ -69,5 +69,5 @@ DESCRIPTION
   you can also specify a path with --path or a published npm package with --npm.
 ```
 
-_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.1.0/src/commands/validate.js)_
+_See code: [src/commands/validate.js](https://github.com/node-red/node-red-dev-cli/blob/v0.1.1/src/commands/validate.js)_
 <!-- commandsstop -->
