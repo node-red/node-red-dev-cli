@@ -163,7 +163,8 @@ function checknodes(path, cli, scorecard, npm_metadata) {
                         cli.warn(`Duplicate nodename ${nodename} found in package ${m.id}`)
                     }
                 })
-            })  
+            })
+            scorecard.N01.nodes = scorecard.N01.nodes.filter((x, i) => i === scorecard.N01.nodes.indexOf(x))  
         })
         .then(() => {
             if (scorecard.N01.test){
