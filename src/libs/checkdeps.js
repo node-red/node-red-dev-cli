@@ -96,7 +96,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
     .then(() => {
         // Check if dependencies are out of date
         scorecard.D03 = {'test' : true, packages : []}
-        return npmCheck({cwd: path, skipUnused: true})
+        return npmCheck({cwd: path, skipUnused: true, ignoreDev: true})
            .then(currentState => {
                 currentState.get('packages').forEach((dep) => {
                     if (!dep.easyUpgrade){

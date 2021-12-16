@@ -113,9 +113,6 @@ function getNodeDefinitions(filename) {
         }
         throw new Error("No type definitions found");
     }
-    if (errors.length > 0) {
-        defs.__errors__ = errors;
-    }
     return defs;
 }
 
