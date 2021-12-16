@@ -74,9 +74,9 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                             }
                             if (Object.keys(badpackages).includes(n) && semver.satisfies(v, badpackages[n])){
                                 cli.warn(`D02 Incompatible package ${i} found as dependency of ${name}`)
-                                reject('Incompatible Packages Found')
                                 scorecard.D02.test = false
                                 scorecard.D02.packages.push(i)
+                                return
                             }           
                         });
                         resolve()
