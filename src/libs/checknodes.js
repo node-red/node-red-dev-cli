@@ -178,7 +178,7 @@ function checknodes(path, cli, scorecard, npm_metadata) {
         new Promise((resolve, reject) => {
             files = []
             if (fs.existsSync(path+'/examples')){
-                files = getAllFiles(path+'/examples')
+                files = getAllFiles(path+'/examples').filter(x => {if (pth.extname(x) == '.json') {return x}} )
             }
             resolve(files)
         })
