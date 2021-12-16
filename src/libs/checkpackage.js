@@ -32,7 +32,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             cli.log(`✅ Package is ${package.license} licensed`)
             scorecard.P01 = {'test' : true, 'license' : package.license}
         } else {
-            cli.error('No License Specified')
+            cli.warn('No License Specified')
             scorecard.P01 = {'test' : false}
         }
       })
@@ -110,7 +110,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
             }    
         }
         if (!scopedRegex.test(package.name)) {
-            const contribRegex = new RegExp('/^(node-red|nodered)(?!-contrib-).*/ig')
+            const contribRegex = new RegExp('^(node-red|nodered)(?!-contrib-).*', 'i')
             if (contribRegex.test(package.name)){
                 cli.warn('P04 Packages using the node-red prefix in their name must use node-red-contrib')
                 scorecard.P04 = { 'test' : false}
@@ -118,8 +118,9 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                 cli.log('✅ Package uses a valid name')
                 scorecard.P04 = { 'test' : true}
             }
-
-
+        } else {
+            cli.log('✅ Package uses a Scoped Name')
+            scorecard.P04 = { 'test' : true}
         }         
     })
     .then(() => {
