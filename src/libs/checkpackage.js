@@ -9,7 +9,7 @@ const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
   });
-
+const officialnodes = require('../officalnodes.json')
 
 function isGitUrl(str) {
   //var regex = /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/;
@@ -111,12 +111,15 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
         }
         if (!scopedRegex.test(package.name)) {
             const contribRegex = new RegExp('^(node-red|nodered)(?!-contrib-).*', 'i')
-            if (contribRegex.test(package.name)){
-                cli.warn('P04 Packages using the node-red prefix in their name must use node-red-contrib')
-                scorecard.P04 = { 'test' : false}
-            } else {
+            if (!contribRegex.test(package.name)){
                 cli.log('✅ Package uses a valid name')
                 scorecard.P04 = { 'test' : true}
+            } else if (officialnodes.nodes.indexOf(package.name) > -1) {
+                cli.log('✅ Package is on the official nodes list')
+                scorecard.P04 = { 'test' : true}
+            } else {
+                cli.warn('P04 Packages using the node-red prefix in their name must use node-red-contrib')
+                scorecard.P04 = { 'test' : false}
             }
         } else {
             cli.log('✅ Package uses a Scoped Name')
