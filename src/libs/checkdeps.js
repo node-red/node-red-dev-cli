@@ -76,7 +76,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                                 cli.warn(`D02 Incompatible package ${i} found as dependency of ${name}`)
                                 scorecard.D02.test = false
                                 scorecard.D02.packages.push(i)
-                                return
+                                //return
                             }           
                         });
                         resolve()
@@ -102,7 +102,7 @@ function checkdeps(path, cli, scorecard, npm_metadata) {
                     if (!dep.easyUpgrade){
                         cli.warn(`D03 ${dep.moduleName} is not at latest version, package.json specifies: ${dep.packageJson}, latest is: ${dep.latest}`)
                         scorecard.D03.test = false
-                        scorecard.D03.packages.push(dep.packageJson)
+                        scorecard.D03.packages.push(dep.moduleName)
                     }
                 })
                 if (scorecard.D03.test) {
