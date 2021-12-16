@@ -20,7 +20,7 @@ $ npm install -g node-red-dev
 $ node-red-dev COMMAND
 running command...
 $ node-red-dev (-v|--version|version)
-node-red-dev/0.1.0 darwin-arm64 node-v16.13.0
+node-red-dev/0.1.1 darwin-arm64 node-v16.13.0
 $ node-red-dev --help [COMMAND]
 USAGE
   $ node-red-dev COMMAND
