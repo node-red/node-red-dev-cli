@@ -98,7 +98,7 @@ function getNodeDefinitions(filename) {
                 }
             });
         } catch(err) {
-            console.log(p);
+            //console.log(p);
 
             errors.push({
                 code:"parse",
@@ -141,8 +141,13 @@ function checknodes(path, cli, scorecard, npm_metadata) {
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Nodes---')
         Object.values(package['node-red'].nodes).forEach((n) =>{
-            let htmlfile = path+"/"+n.replace(".js", ".html")
+            try {
+                let htmlfile = path+"/"+n.replace(".js", ".html")
             Object.assign(defs, getNodeDefinitions(htmlfile))
+            } catch (error){
+                console.log('Unable to parse ',n)
+            }
+            
         })    
         resolve();
       })
