@@ -195,13 +195,18 @@ function checknodes(path, cli, scorecard, npm_metadata) {
                 })
                 allnodes = [...checknodes]
                 files.forEach((file) => {
-                    let example = JSON.parse(fs.readFileSync(file));
+                    try {
+                        let example = JSON.parse(fs.readFileSync(file));
                     example.forEach((n) => {
                         const index = checknodes.indexOf(n.type);
                         if (index > -1) {
                             checknodes.splice(index, 1);
                         }
                     })
+                    } catch (error){
+                        cli.warn("Unable to read example : "+file)
+                    }
+                    
                 })
                 let examplenodes = allnodes.filter(x => !checknodes.includes(x))
                 if (checknodes.length != 0){
