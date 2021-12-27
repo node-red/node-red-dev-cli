@@ -4,6 +4,7 @@ const fs = require("fs");
 const axios = require('axios')
 const pth = require("path");
 const { pathToFileURL } = require('url');
+const util = require('util');
 
 
 function getNodeDefinitions(filename) {
@@ -98,7 +99,7 @@ function getNodeDefinitions(filename) {
                 }
             });
         } catch(err) {
-            console.log(p);
+            //console.log(p);
 
             errors.push({
                 code:"parse",
@@ -141,8 +142,13 @@ function checknodes(path, cli, scorecard, npm_metadata) {
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Nodes---')
         Object.values(package['node-red'].nodes).forEach((n) =>{
-            let htmlfile = path+"/"+n.replace(".js", ".html")
+            try {
+                let htmlfile = path+"/"+n.replace(".js", ".html")
             Object.assign(defs, getNodeDefinitions(htmlfile))
+            } catch (error){
+                console.log('Unable to parse ',n)
+            }
+            
         })    
         resolve();
       })
@@ -189,13 +195,18 @@ function checknodes(path, cli, scorecard, npm_metadata) {
                 })
                 allnodes = [...checknodes]
                 files.forEach((file) => {
-                    let example = JSON.parse(fs.readFileSync(file));
+                    try {
+                        let example = JSON.parse(fs.readFileSync(file));
                     example.forEach((n) => {
                         const index = checknodes.indexOf(n.type);
                         if (index > -1) {
                             checknodes.splice(index, 1);
                         }
                     })
+                    } catch (error){
+                        cli.warn("Unable to read example : "+file)
+                    }
+                    
                 })
                 let examplenodes = allnodes.filter(x => !checknodes.includes(x))
                 if (checknodes.length != 0){

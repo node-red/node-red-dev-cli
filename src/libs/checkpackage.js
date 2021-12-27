@@ -211,7 +211,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                     scorecard.P07.version = package.engines.node
                 } else {
                     cli.warn('P07 Minimum Node version is not compatible with minimum supported Node-RED Version Node v'+nminversion)
-                    scorecard.P07 = { 'test' : fail}
+                    scorecard.P07 = { 'test' : false}
                     scorecard.P07.version = package.engines.node
                 }
             })
