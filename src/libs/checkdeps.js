@@ -7,12 +7,12 @@ const readline = require('readline').createInterface({
     output: process.stdout
   });
 const npmls = require('npm-remote-ls').ls;
-//let npmls_config = require('npm-remote-ls').config 
-//npmls_config({
-//  development: false,
-//  optional: false
-//})
- 
+const npmls_config = require('npm-remote-ls').config
+npmls_config({
+    development: false,
+    optional: false
+})
+
 const { resolve } = require('path');
 const util = require('util');
 const npmCheck = require('npm-check');
