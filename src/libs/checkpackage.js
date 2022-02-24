@@ -16,7 +16,21 @@ function isGitUrl(str) {
   var regex = /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\/?|\#[-\d\w._]+?)$/;
   return regex.test(str);
 };
-  
+
+function getNestedProperty(obj, key) {
+    var properties = key.split(".");
+    for (var i = 0; i < properties.length; i++) {
+    if (!obj || !obj.hasOwnProperty(properties[i])) {
+        return;
+        }
+        obj = obj[properties[i]];
+        }
+        return obj;
+    }
+
+function checkUrlMatch(arr, val) {
+  return arr.some(arrVal => val === arrVal);
+}
 
 function checkpackage(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
@@ -37,16 +51,35 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
         }
       })
       .then(() => {
-        //MUST Have Repository or Bugs url/email P03
-        if (package.hasOwnProperty('repository') || package.hasOwnProperty('bugs')){
-            cli.log(`✅ Repository/Bugs Link Supplied`)
+
+
+        //MUST Have Repository and Bugs url/email P03
+	let bugsResult = false
+	// Check if repo url exists, and if it includes node package name
+	if (getNestedProperty(package, "repository.url")){
+	let urlSplit = ((package.repository.url).trim().split(/[/.]+/))
+	if (checkUrlMatch(urlSplit, package.name)){
+		// Check if bugs url exists, and url slug includes 'issues'
+		if (getNestedProperty(package, "bugs.url")){
+			let slug = ((package.bugs.url).trim().split("/")).pop()
+			let conditions = ['issues',] //other conditions can be included for edge cases
+			bugsResult = (conditions.some(el => slug.includes(el))) ? true:false
+		// Check if bugs email exists, and if so, perform basic regex check
+		} else if (getNestedProperty(package, "bugs.email")){
+			bugsResult = (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(package.bugs.email)) ? true:false
+			}
+		}
+	}
+        if (bugsResult == true){
+            cli.log(`✅ Repositoy & Bugs Link Supplied`)
             scorecard.P03 = {'test' : true}
         } else {
-            cli.warn('P03 Please provide either a repository URL or a Bugs URL/Email')
+            cli.warn('P03 Please provide a repository URL & Bugs URL/Email')
             scorecard.P03 = {'test' : false}
         }
       })
-    // Test P02 Disabled pending a more effieint method than nodegit  
+
+  // Test P02 Disabled pending a more effieint method than nodegit  
     //.then(() => {
     //     // Check package in repository is the same name as the package.json (check for forks) - This may need more thought and testing P02
     //    if (package.hasOwnProperty('repository')){
