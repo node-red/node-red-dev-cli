@@ -100,16 +100,14 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                 legacy = true
             }
         }
-        if (!legacy){
-            if (scopedRegex.test(package.name)){
-                cli.log('✅ Package uses a Scoped Name')
-                scorecard.P04 = { 'test' : true}
-            } else {
-                cli.warn('P04 New Packages should use a scoped name')
-                scorecard.P04 = { 'test' : false}
-            }    
-        }
-        if (!scopedRegex.test(package.name)) {
+
+        if (scopedRegex.test(package.name)){
+            cli.log('✅ Package uses a Scoped Name')
+            scorecard.P04 = { 'test' : true}
+        } else if (!legacy){
+            cli.warn('P04 New Packages should use a scoped name')
+            scorecard.P04 = { 'test' : false}
+        } else {
             const contribRegex = new RegExp('^(node-red|nodered)(?!-contrib-).*', 'i')
             if (!contribRegex.test(package.name)){
                 cli.log('✅ Package uses a valid name')
@@ -121,10 +119,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
                 cli.warn('P04 Packages using the node-red prefix in their name must use node-red-contrib')
                 scorecard.P04 = { 'test' : false}
             }
-        } else {
-            cli.log('✅ Package uses a Scoped Name')
-            scorecard.P04 = { 'test' : true}
-        }         
+        }      
     })
     .then(() => {
         //Check for other package of same name in different scope, ask about fork? P08
