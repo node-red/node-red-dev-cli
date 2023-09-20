@@ -20,6 +20,10 @@ function isGitUrl(str) {
 
 function checkpackage(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json');
+    // Remove the file from the module-cache so if we're being run
+    // programmatically we don't cache previous versions
+    delete require.cache[require.resolve(path+'/package.json')]
+
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Package---')
         cli.log(`   ${package.name}@${package.version}`)  
@@ -71,6 +75,7 @@ function checkpackage(path, cli, scorecard, npm_metadata) {
     //                let path = r.workdir()
     //            }
     //            let repopackage = require(path+'/package.json')
+    //            delete require.cache[require.resolve(path+'/package.json')]
     //            if (package.name != repopackage.name){
     //                cli.warn('P02 Package name does not match package.json in repository')
     //                scorecard.P02 = {'test' : false}
