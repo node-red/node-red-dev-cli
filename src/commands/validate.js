@@ -53,6 +53,10 @@ class ValidateCommand extends Command {
     await checkpackage(path, cli, scorecard, npm_metadata)
     .then(scorecard => {
       let pkg = require(path+'/package.json')
+      // Remove the file from the module-cache so if we're being run
+      // programmatically we don't cache previous versions
+      delete require.cache[require.resolve(path+'/package.json')]
+
       if (!pkg['node-red'].hasOwnProperty('nodes')){ //If no nodes declared skip node validation (could be a plugin)
         cli.warn('No nodes declared in package.json')
         return(scorecard)

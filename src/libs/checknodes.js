@@ -138,6 +138,10 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
 
 function checknodes(path, cli, scorecard, npm_metadata) {
     const package = require(path+'/package.json')
+    // Remove the file from the module-cache so if we're being run
+    // programmatically we don't cache previous versions
+    delete require.cache[require.resolve(path+'/package.json')]
+
     let defs = {}
     return new Promise((resolve, reject) => {
         cli.log('    ---Validating Nodes---')
